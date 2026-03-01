@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.eoin.screenshot-renamer</string>
+    <string>com.corkcode.screenshot-renamer</string>
 
     <key>ProgramArguments</key>
     <array>

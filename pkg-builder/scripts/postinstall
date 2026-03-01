@@ -16,7 +16,7 @@ VENV_PYTHON="$VENV_DIR/bin/python3"
 PYTHON_SCRIPT="$SCREENSHOTS_DIR/auto-rename-screenshots.py"
 KEY_FILE="$SCREENSHOTS_DIR/.anthropic-api-key"
 AGENT_DIR="$REAL_HOME/Library/LaunchAgents"
-PLIST_DST="$AGENT_DIR/com.smartscreenshots.plist"
+PLIST_DST="$AGENT_DIR/com.corkcode.screenshot-renamer.plist"
 
 # ── Create Screenshots folder and copy script ────────────────────────────────
 sudo -u "$REAL_USER" mkdir -p "$SCREENSHOTS_DIR"
@@ -81,7 +81,7 @@ sudo -u "$REAL_USER" mkdir -p "$AGENT_DIR"
 sed \
     -e "s|VENV_PYTHON_PATH|$VENV_PYTHON|g" \
     -e "s|SCRIPT_PATH|$PYTHON_SCRIPT|g" \
-    "$SRC_DIR/com.smartscreenshots.plist.template" \
+    "$SRC_DIR/com.corkcode.screenshot-renamer.plist.template" \
     | sudo -u "$REAL_USER" tee "$PLIST_DST" > /dev/null
 
 # Load the agent (unload first in case it was already registered)
