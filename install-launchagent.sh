@@ -6,9 +6,9 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PLIST_SRC="$SCRIPT_DIR/com.corkcode.screenshot-renamer.plist"
+PLIST_SRC="$SCRIPT_DIR/com.corkcode.smartscreenshots.plist"
 AGENT_DIR="$HOME/Library/LaunchAgents"
-PLIST_DST="$AGENT_DIR/com.corkcode.screenshot-renamer.plist"
+PLIST_DST="$AGENT_DIR/com.corkcode.smartscreenshots.plist"
 KEY_FILE="$SCRIPT_DIR/.anthropic-api-key"
 PYTHON_SCRIPT="$SCRIPT_DIR/auto-rename-screenshots.py"
 

@@ -52,12 +52,12 @@ Claude's API charges per image analysed. At current rates, renaming 100 screensh
 |------|---------|
 | `auto-rename-screenshots.py` | Main rename script |
 | `install-launchagent.sh` | One-time setup script |
-| `com.corkcode.screenshot-renamer.plist` | LaunchAgent plist template |
+| `com.corkcode.smartscreenshots.plist` | LaunchAgent plist template |
 | `pkg-builder/` | macOS `.pkg` installer source |
 
 ## Uninstall
 
 ```bash
-launchctl unload ~/Library/LaunchAgents/com.corkcode.screenshot-renamer.plist
-rm ~/Library/LaunchAgents/com.corkcode.screenshot-renamer.plist
+launchctl unload ~/Library/LaunchAgents/com.corkcode.smartscreenshots.plist
+rm ~/Library/LaunchAgents/com.corkcode.smartscreenshots.plist
 ```
