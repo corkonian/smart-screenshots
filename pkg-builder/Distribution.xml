@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+
+    <title>SmartScreenshots</title>
+    <background file="background.png" alignment="bottomleft" scaling="none"/>
+
+    <!-- Custom screens -->
+    <welcome    file="welcome.html" mime-type="text/html"/>
+    <readme     file="readme.html"  mime-type="text/html"/>
+
+    <options customize="never" require-scripts="true" rootVolumeOnly="true"/>
+
+    <!-- Require macOS 12 or later -->
+    <os-version min="12.0.0"/>
+
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.smartscreenshots"/>
+        </line>
+    </choices-outline>
+
+    <choice id="default"/>
+
+    <choice id="com.smartscreenshots"
+            visible="false"
+            title="SmartScreenshots"
+            description="Installs the screenshot renaming script and background LaunchAgent.">
+        <pkg-ref id="com.smartscreenshots"/>
+    </choice>
+
+    <pkg-ref id="com.smartscreenshots"
+             version="1.0"
+             onConclusion="none">SmartScreenshots-component.pkg</pkg-ref>
+
+</installer-gui-script>

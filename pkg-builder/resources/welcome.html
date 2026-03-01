@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    color: #1d1d1f;
+    margin: 0;
+    padding: 20px 28px;
+    line-height: 1.55;
+  }
+  h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    color: #000;
+  }
+  p { margin: 0 0 12px 0; }
+  ul {
+    margin: 6px 0 14px 0;
+    padding-left: 20px;
+  }
+  li { margin-bottom: 5px; }
+  .tag {
+    display: inline-block;
+    background: rgba(128, 128, 128, 0.15);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 12px;
+    font-family: "SF Mono", Menlo, monospace;
+    color: inherit;
+  }
+  .note {
+    background: rgba(128, 128, 128, 0.1);
+    border-left: 3px solid #0071e3;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: inherit;
+  }
+</style>
+</head>
+<body>
+  <h2>SmartScreenshots</h2>
+
+  <p>This tool automatically gives your screenshots meaningful names — so instead of <span class="tag">Screenshot 2026-02-17 at 1.05.48 PM.png</span> you get something like <span class="tag">2026-02-17_zoom-weekly-team-standup.png</span>.</p>
+
+  <p>Here's how it works:</p>
+  <ul>
+    <li>macOS saves new screenshots to your <strong>~/Desktop/Screenshots</strong> folder</li>
+    <li>Once an hour, this tool scans that folder for any new unprocessed screenshots</li>
+    <li>Each one is sent to <strong>Claude AI</strong>, which reads the image and generates a short descriptive title</li>
+    <li>The file is renamed to <strong>YYYY-MM-DD_descriptive-title.png</strong> automatically</li>
+  </ul>
+
+  <p>The renamer runs silently in the background as a macOS LaunchAgent — no app to keep open, no menu bar icon.</p>
+
+  <div class="note">
+    <strong>What gets installed:</strong> a Python script in <code>/usr/local/smartscreenshots/</code>, a virtual environment with the Anthropic SDK, and a LaunchAgent in your <code>~/Library/LaunchAgents/</code> folder.
+  </div>
+</body>
+</html>

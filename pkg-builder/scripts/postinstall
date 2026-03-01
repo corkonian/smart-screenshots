@@ -1,0 +1,91 @@
+#!/bin/bash
+# postinstall — runs as root after the package payload is installed.
+# Sets up the per-user environment: Screenshots folder, venv, API key, LaunchAgent.
+
+set -e
+
+SRC_DIR="/usr/local/smartscreenshots"
+
+# ── Identify the logged-in user ─────────────────────────────────────────────
+REAL_USER=$(stat -f%Su /dev/console)
+REAL_HOME=$(dscl . -read "/Users/$REAL_USER" NFSHomeDirectory | awk '{print $2}')
+
+SCREENSHOTS_DIR="$REAL_HOME/Desktop/Screenshots"
+VENV_DIR="$SCREENSHOTS_DIR/.venv"
+VENV_PYTHON="$VENV_DIR/bin/python3"
+PYTHON_SCRIPT="$SCREENSHOTS_DIR/auto-rename-screenshots.py"
+KEY_FILE="$SCREENSHOTS_DIR/.anthropic-api-key"
+AGENT_DIR="$REAL_HOME/Library/LaunchAgents"
+PLIST_DST="$AGENT_DIR/com.smartscreenshots.plist"
+
+# ── Create Screenshots folder and copy script ────────────────────────────────
+sudo -u "$REAL_USER" mkdir -p "$SCREENSHOTS_DIR"
+sudo -u "$REAL_USER" cp "$SRC_DIR/auto-rename-screenshots.py" "$PYTHON_SCRIPT"
+
+# ── Find a suitable Python 3 (Homebrew preferred) ───────────────────────────
+PYTHON=""
+for candidate in \
+    /opt/homebrew/bin/python3 \
+    /usr/local/bin/python3 \
+    /usr/bin/python3; do
+    if [ -x "$candidate" ] && "$candidate" -c "import sys; assert sys.version_info >= (3,8)" 2>/dev/null; then
+        PYTHON="$candidate"
+        break
+    fi
+done
+
+if [ -z "$PYTHON" ]; then
+    sudo -u "$REAL_USER" osascript -e \
+        'display dialog "Python 3.8 or later is required but was not found.\n\nInstall it with Homebrew:\n  brew install python" buttons {"OK"} with title "SmartScreenshots" with icon stop'
+    exit 1
+fi
+
+# ── Create virtual environment and install the Anthropic SDK ─────────────────
+if [ ! -f "$VENV_PYTHON" ]; then
+    sudo -u "$REAL_USER" "$PYTHON" -m venv "$VENV_DIR"
+fi
+sudo -u "$REAL_USER" "$VENV_DIR/bin/pip" install anthropic --quiet
+
+# ── Prompt for the Anthropic API key ────────────────────────────────────────
+API_KEY=$(sudo -u "$REAL_USER" osascript <<'APPLESCRIPT'
+set dlg to display dialog "Paste your Anthropic API key below to complete setup.
+
+Your key starts with sk-ant- and is used only to call the Claude Vision API when renaming screenshots.
+
+Don't have one yet? Visit: console.anthropic.com/keys" \
+    default answer "" \
+    with title "SmartScreenshots — API Key" \
+    buttons {"Skip for Now", "Finish Setup"} \
+    default button "Finish Setup"
+
+if button returned of dlg is "Finish Setup" then
+    return text returned of dlg
+else
+    return ""
+end if
+APPLESCRIPT
+) || true   # don't fail if user dismisses the dialog
+
+if [ -n "$API_KEY" ]; then
+    printf '%s' "$API_KEY" | sudo -u "$REAL_USER" tee "$KEY_FILE" > /dev/null
+    sudo -u "$REAL_USER" chmod 600 "$KEY_FILE"
+else
+    sudo -u "$REAL_USER" osascript -e \
+        'display dialog "No API key saved. You can add it later by saving it to:\n~/Desktop/Screenshots/.anthropic-api-key" buttons {"OK"} with title "SmartScreenshots"' \
+        > /dev/null || true
+fi
+
+# ── Install the LaunchAgent ──────────────────────────────────────────────────
+sudo -u "$REAL_USER" mkdir -p "$AGENT_DIR"
+
+sed \
+    -e "s|VENV_PYTHON_PATH|$VENV_PYTHON|g" \
+    -e "s|SCRIPT_PATH|$PYTHON_SCRIPT|g" \
+    "$SRC_DIR/com.smartscreenshots.plist.template" \
+    | sudo -u "$REAL_USER" tee "$PLIST_DST" > /dev/null
+
+# Load the agent (unload first in case it was already registered)
+sudo -u "$REAL_USER" launchctl unload "$PLIST_DST" 2>/dev/null || true
+sudo -u "$REAL_USER" launchctl load -w "$PLIST_DST"
+
+exit 0
